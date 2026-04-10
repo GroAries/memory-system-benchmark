@@ -1,61 +1,74 @@
 ---
 name: "memory-system-benchmark"
-description: "Scientific Benchmark Tool for Agent Memory Systems - Based on First Principles. Supports NIAH, MultiHop, and Token Efficiency testing for DNA, Memory Palace, Mem0, etc."
-version: "1.0.0"
+description: "Scientific Benchmark Tool for Agent Memory Systems v2.0 - Plugin-based, Fair Comparison Engine. Supports NIAH, MultiHop, and Token Efficiency testing."
+version: "2.0.0"
 author: "GroAries"
 created: "2026-04-10"
 metadata:
   category: "testing"
-  tags: ["benchmark", "memory-system", "first-principles", "NIAH", "MultiHop", "DNA-v5"]
-  requires: { "python": ["tiktoken"] }
+  tags: ["benchmark", "memory-system", "first-principles", "multi-hop", "scientific"]
+  requires: ["python3", "tiktoken"]
   status: "active"
 ---
 
-# 🔬 Agent Memory System Benchmark (Scientific Edition)
+# 🔬 Agent Memory System Benchmark v2.0
 
-基于**第一性原理**重构的公平对比框架，用于科学评估各类 Agent 记忆系统的性能。
+**The Scientific Arena for Memory Systems.**
+基于**第一性原理**与**控制论**重构的公平对比框架。通过插件化架构 (Plugin Architecture)，实现了真正的科学对比。
 
-## 核心特性
-1. **公平对比**：所有系统在同一数据集上运行，使用同一查询集。
-2. **真实实现**：不硬编码结果，每个系统实现真实的检索逻辑。
-3. **精确计量**：使用 `tiktoken` (cl100k_base) 精确计算 Token 消耗。
-4. **统计可靠**：100+ 次抽样，报告均值 ± 标准差。
+## 🌟 核心特性
 
-## 支持系统
-- **DNA v5.1**: 确定性记忆 + 世界模型 (World Model)
-- **DNA v5.1.6**: 双重双层脑 + 控制论自进化 (Dual-Brain)
-- **记忆宫殿**: 全量加载方案 (Memory Palace)
-- **Mem0**: 向量 + 图谱混合 (SOTA Simulation)
-- **Letta**: 上下文分块管理 (MemGPT Simulation)
-- **Naive RAG**: 纯向量检索
+1.  **绝对中立的核心 (Neutral Core)**：引擎仅负责数据加载、查询生成、Token 计量 (`tiktoken`) 和结果统计。**不包含任何具体的检索逻辑**，彻底消除了“既当裁判又当运动员”的嫌疑。
+2.  **插件化适配器 (Plugin Adapters)**：
+    - `v5.1`: 基于 TF-IDF + 静态 BFS 的基线实现。
+    - `v5.2.2`: 基于**概念共振 (Concept Resonance)** + **贝叶斯融合 (Bayesian Fusion)** + **动态 PID 控制**的完全体实现。
+    - *支持扩展*：你可以轻松编写新的 Adapter 来测试其他系统 (如 Mem0, Letta, 或向量数据库)。
+3.  **全闭环多跳模拟 (Full-Loop Multi-Hop)**：不再是一次性的检索，而是模拟真实的 "Search -> Expand -> Prune -> Rescore" 迭代搜索过程。
+4.  **动态资源控制 (Dynamic Budgeting)**：严格监控 Token 预算，当达到限制时自动截断，确保对比在相同资源消耗下进行。
 
-## 测试维度
-- **NIAH (Needle In A Haystack)**: 长文本精确召回率
-- **MultiHop (2-Hop / 3-Hop)**: 多跳逻辑推理连通率
-- **Token Efficiency**: 检索过程中的 Token 消耗效率
-- **Latency**: 检索响应延迟
-
-## 快速开始
+## 🛠️ 快速使用
 
 ```bash
-# 1. 安装依赖
-pip install tiktoken
+# 进入工具目录
+cd memory-system-benchmark-skill
 
-# 2. 准备数据
-# 将记忆节点 JSON 放置在 data/nodes/ 目录下
-# 将图谱边 JSON 放置在 data/edges/edges.json
+# 运行对比测试
+# --data-dir: 记忆数据的路径 (包含 nodes/ 和 edges/)
+# --queries: 查询数量
+# --systems: 选择要测试的系统 (逗号分隔)
+python bin/run_benchmark.py \
+  --data-dir /path/to/your/data \
+  --queries 100 \
+  --systems v51,v522
 
-# 3. 运行测试
-python run_benchmark.py --data-dir ./data --queries 100
-
-# 4. 生成报告
-python report_generator.py --results benchmark_results.json
+# 仅测试 v5.2.2
+python bin/run_benchmark.py \
+  --data-dir /path/to/your/data \
+  --queries 50 \
+  --systems v522
 ```
 
-## 科学方法论
-- **控制变量**：同数据集、同查询集、同 Token 计算器。
-- **大样本**：默认 100 次随机查询，消除偶然性。
-- **透明**：所有系统逻辑开源可查，拒绝黑盒。
+## 🧩 扩展指南 (如何添加新系统?)
+
+如果你想测试一个新的记忆系统 (比如 "MyNewMemory"):
+
+1.  在 `bin/adapters/` 下创建 `mymemory_adapter.py`。
+2.  实现 `MemorySystemAdapter` 接口：
+    ```python
+    from .base import MemorySystemAdapter
+    class MyNewAdapter(MemorySystemAdapter):
+        def retrieve(self, keywords, target_id=None, budget_tokens=5000):
+            # 实现你的检索逻辑...
+            # 必须返回 {"found": bool, "tokens": int, ...}
+            return {"found": False, "tokens": 0}
+    ```
+3.  在 `bin/run_benchmark.py` 的 `systems_map` 中注册你的适配器。
+
+## 📊 测试维度
+
+- **2-Hop / 3-Hop Recall**: 验证多跳连通率。
+- **Token Efficiency**: 找回目标所需的平均 Token 消耗。
+- **Latency**: 响应时间。
 
 ---
-*Designed with First Principles Thinking & Cybernetics.*
+*Powered by First Principles Thinking.*
